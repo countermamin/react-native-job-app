@@ -20,12 +20,17 @@ const useFetch = (endpoint, query) => {
     setIsLoading(true);
     try {
       const response = await axios.request(options);
-
       setData(response.data.data);
       setIsLoading(false);
     } catch (error) {
-      setError(error);
-      alert('There is an error');
+      if (error.response.status === 429) {
+        // Add a delay of 2 second before retrying the request
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        fetchData();
+      } else {
+        setError(error);
+        alert('There is an error');
+      }
     } finally {
       setIsLoading(false);
     }
